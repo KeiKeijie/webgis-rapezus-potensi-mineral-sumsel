@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sumsel Spatial Resource Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .leaflet-container { background: #0f172a; }
+        /* Efek kaca transparan premium */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 h-screen w-screen overflow-hidden flex relative">
+
+    <div id="map" class="absolute inset-0 w-full h-full z-0"></div>
+
+    <div class="absolute left-4 top-4 bottom-4 w-80 glass-panel border border-slate-700/40 rounded-2xl flex flex-col z-[1000] shadow-2xl overflow-hidden animate-fade-in">
+        <div class="p-5 border-b border-slate-700/40 bg-slate-900/50">
+            <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                <img src="logo_rapezus.png" alt="Logo" class="w-16 h-16"> Peta Potensi Mineral di Sumatra Selatan
+            </h1>
+            <p class="text-[11px] text-slate-400 mt-1">Dibuat Oleh: Kelompok Rapez Us BB</p>
+            <div class="mt-1 text-[10px] text-slate-500">
+    <p class="font-semibold text-slate-400">Anggota:</p>
+    <ul class="mt-0.5 space-y-0.5">
+        <li>• (23-2024-018) Granada Surya Kusumadinata </li>
+        <li>• (23-2024-022) Irsyad Zidan Abunanto</li>
+        <li>• (23-2024-040) Alfian Nurrochim</li>
+    </ul>
+</div>
+        </div>
+
+        <div class="p-5 flex-1 overflow-y-auto space-y-4">
+            <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pilih Lapisan Potensi</h3>
+            <div class="space-y-2.5">
+                
+                <label class="flex items-center justify-between p-3 bg-slate-800/30 hover:bg-slate-800/70 rounded-xl border border-slate-700/20 cursor-pointer transition-all duration-200">
+                    <div class="flex items-center gap-3">
+                        <span class="w-2.5 h-2.5 rounded-full bg-gray-500 shadow-[0_0_8px_#808080]"></span>
+                        <span class="text-xs font-medium">Potensi Batubara</span>
+                    </div>
+                    <input type="checkbox" id="btn-batubara" class="w-4 h-4 rounded text-emerald-500 bg-slate-700 border-slate-600 focus:ring-0">
+                </label>
+
+                <label class="flex items-center justify-between p-3 bg-slate-800/30 hover:bg-slate-800/70 rounded-xl border border-slate-700/20 cursor-pointer transition-all duration-200">
+                    <div class="flex items-center gap-3">
+                        <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 shadow-[0_0_8px_#facc15]"></span>
+                        <span class="text-xs font-medium">Potensi Logam Mulia</span>
+                    </div>
+                    <input type="checkbox" id="btn-logam" class="w-4 h-4 rounded text-emerald-500 bg-slate-700 border-slate-600 focus:ring-0">
+                </label>
+
+                <label class="flex items-center justify-between p-3 bg-slate-800/30 hover:bg-slate-800/70 rounded-xl border border-slate-700/20 cursor-pointer transition-all duration-200">
+                    <div class="flex items-center gap-3">
+                        <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]"></span>
+                        <span class="text-xs font-medium">Industri Semen & Kapur</span>
+                    </div>
+                    <input type="checkbox" id="btn-semen" class="w-4 h-4 rounded text-emerald-500 bg-slate-700 border-slate-600 focus:ring-0">
+                </label>
+
+                <label class="flex items-center justify-between p-3 bg-slate-800/30 hover:bg-slate-800/70 rounded-xl border border-slate-700/20 cursor-pointer transition-all duration-200">
+                    <div class="flex items-center gap-3">
+                        <span class="w-2.5 h-2.5 rounded-full bg-fuchsia-500 shadow-[0_0_8px_#d946ef]"></span>
+                        <span class="text-xs font-medium">Batuan Komersial / Ornamen</span>
+                    </div>
+                    <input type="checkbox" id="btn-komersial" class="w-4 h-4 rounded text-emerald-500 bg-slate-700 border-slate-600 focus:ring-0">
+                </label>
+
+                <label class="flex items-center justify-between p-3 bg-slate-800/30 hover:bg-slate-800/70 rounded-xl border border-slate-700/20 cursor-pointer transition-all duration-200">
+                    <div class="flex items-center gap-3">
+                        <span class="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_8px_#8B5A2B]"></span>
+                        <span class="text-xs font-medium">Material Konstruksi (Gol. C)</span>
+                    </div>
+                    <input type="checkbox" id="btn-konstruksi" class="w-4 h-4 rounded text-emerald-500 bg-slate-700 border-slate-600 focus:ring-0">
+                </label>
+
+            </div>
+        </div>
+
+        <div class="p-4 bg-slate-900/70 border-t border-slate-700/40 text-[10px] text-slate-400 space-y-0.5 font-mono">
+            <p>Database: <span class="text-emerald-400">PostgreSQL + PostGIS</span></p>
+            <p>Sistem Koordinat: <span class="text-emerald-400">EPSG:4326</span></p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Set view peta fokus ke wilayah Sumatra Selatan
+        const map = L.map('map', { zoomControl: false }).setView([-3.3194, 103.9144], 8); 
+
+        // Menggunakan Premium Dark Basemap (Sangat bersih dan kontras)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; CARTO'
+        }).addTo(map);
+
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        const layersStorage = {};
+        
+        // Palet warna modern menyala untuk masing-masing poligon potensi
+        const styles = {
+            'batubara':   { color: '#808080', fillColor: '#808080', fillOpacity: 0.35, weight: 1.2 },
+            'logam':      { color: '#facc15', fillColor: '#facc15', fillOpacity: 0.35, weight: 1.2 },
+            'semen':      { color: '#22d3ee', fillColor: '#22d3ee', fillOpacity: 0.35, weight: 1.2 },
+            'komersial':  { color: '#d946ef', fillColor: '#d946ef', fillOpacity: 0.35, weight: 1.2 },
+            'konstruksi': { color: '#8B5A2B', fillColor: '#8B5A2B', fillOpacity: 0.35, weight: 1.2 }
+        };
+
+        async function toggleLayer(key, endpoint, isChecked) {
+            if (isChecked) {
+                try {
+                    const res = await fetch(`http://localhost:5000/api/${endpoint}`);
+                    const data = await res.json();
+                    
+                    layersStorage[key] = L.geoJSON(data, {
+                        style: styles[key],
+                        onEachFeature: function(feature, layer) {
+                            let props = feature.properties;
+                            console.log(props);
+                            debugger;
+                            let info = `
+                                <div class="p-2 font-sans text-slate-800">
+                                    <h4 class="font-bold border-b border-slate-200 pb-1 mb-1.5 text-xs uppercase text-indigo-700">Informasi Objek Spasial</h4>
+                                    <table class="text-[11px] w-full border-collapse">
+                                        <tr class="border-b border-slate-100"><td class="py-1 font-semibold text-slate-400">Formasi:</td><td>${props.formation || props.name || '-'}</td></tr>
+                                        <tr class="border-b border-slate-100"><td class="py-1 font-semibold text-slate-400">Litologi:</td><td>${props.class_lith || '-'}</td></tr>
+                                        <tr class="border-b border-slate-100">
+                                        <td class="py-1 font-semibold text-slate-400">Kabupaten:</td>
+                                        <td>${props.kabupaten || '-'}</td>
+                                        </tr>
+                                        ${props.skor_batubara ? `<tr><td class="py-1 font-semibold text-emerald-600">Skor Inti:</td><td class="font-bold text-emerald-600">${props.skor_batubara}</td></tr>` : ''}
+                                    </table>
+                                </div>
+                            `;
+                            layer.bindPopup(info, { maxWidth: 280 });
+                            
+                            // Efek hover interaktif premium anti-lag
+                            layer.on('mouseover', function() { this.setStyle({ fillOpacity: 0.7, weight: 2 }); });
+                            layer.on('mouseout', function() { this.setStyle(styles[key]); });
+                        }
+                    }).addTo(map);
+                } catch (e) {
+                    console.error("Gagal memuat data dari server: ", e);
+                }
+            } else {
+                if (layersStorage[key]) {
+                    map.removeLayer(layersStorage[key]);
+                    delete layersStorage[key];
+                }
+            }
+        }
+
+        // Event listener penghubung checkbox ke peta
+        document.getElementById('btn-batubara').addEventListener('change', (e) => toggleLayer('batubara', 'potensi-batubara', e.target.checked));
+        document.getElementById('btn-logam').addEventListener('change', (e) => toggleLayer('logam', 'potensi-logam', e.target.checked));
+        document.getElementById('btn-semen').addEventListener('change', (e) => toggleLayer('semen', 'potensi-semen', e.target.checked));
+        document.getElementById('btn-komersial').addEventListener('change', (e) => toggleLayer('komersial', 'potensi-batuan-komersial', e.target.checked));
+        document.getElementById('btn-konstruksi').addEventListener('change', (e) => toggleLayer('konstruksi', 'potensi-material-konstruksi', e.target.checked));
+    </script>
+</body>
+</html>
